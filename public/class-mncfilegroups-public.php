@@ -10,6 +10,8 @@
  * @subpackage Mncfilegroups/public
  */
 
+use mnc\HTMLHelper;
+
 /**
  * The public-facing functionality of the plugin.
  *
@@ -27,7 +29,7 @@ class Mncfilegroups_Public {
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
+	 * @var      string $plugin_name The ID of this plugin.
 	 */
 	private $plugin_name;
 
@@ -36,21 +38,22 @@ class Mncfilegroups_Public {
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
+	 * @var      string $version The current version of this plugin.
 	 */
 	private $version;
 
 	/**
 	 * Initialize the class and set its properties.
 	 *
+	 * @param string $plugin_name The name of the plugin.
+	 * @param string $version The version of this plugin.
+	 *
 	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of the plugin.
-	 * @param      string    $version    The version of this plugin.
 	 */
 	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
-		$this->version = $version;
+		$this->version     = $version;
 
 	}
 
@@ -100,17 +103,29 @@ class Mncfilegroups_Public {
 
 	}
 
+
 	public function register_shortcodes() {
-		add_shortcode( 'mnc_list_filegroup', function ( $params ) {
+		$this->register_shortcode_list();
+		$this->register_shortcode_attachments();
+	}
+
+	protected function register_shortcode_attachments() {
+		add_shortcode( 'mnc_doc_attachments', function () {
+			global $post;
+			return $this->renderDownloadBox('Downloads:', $this->renderDownloadgroupByPost($post));
+		} );
+	}
+
+	protected function register_shortcode_list() {
+		add_shortcode( 'mnc_doclist', function ( $params ) {
 
 			// init:
-			$a     = shortcode_atts( array(
-				'title' => 'Dokumente:',
-				'cat'   => false,
+			$a      = shortcode_atts( array(
+				'id'    => '',
+				'empty' => 'Notfound',
 			), $params );
-			$title = $a['title'];
-			$cat   = $a['cat'];
-			$list  = '';
+			$the_id = $a['id'];
+			$empty  = $a['empty'];
 
 			// go:
 			$render_template = function ( $title, $content ) {
@@ -128,48 +143,99 @@ class Mncfilegroups_Public {
 				return '<li' . $class . '><a href="' . $url . '" target="_self">' . $filename . ' (' . $filesize . ')</a></li>';
 			};
 
-			$args = [
-				'post_type'   => 'attachment',
-				'post_status' => 'inherit',
-			];
-			if ( $cat ) {
-				$cat               = explode( ",", $cat );
-				$args['tax_query'] = [
-					[
-						'taxonomy' => 'media_category',
-						'field'    => 'slug',
-						'terms'    => $cat // term slug
-					]
-				];
+//			$args     = array(
+//				'ID'          => $slug,
+//				'post_type'   => 'mnc_filegroups',
+//				'post_status' => 'publish',
+//				'numberposts' => 1
+//			);
+			$post = get_post( $the_id );
+			if ( ! ( $post && $post->post_type == 'mnc_filegroups' ) ) {
+				return $empty;
 			}
 
 			//
-			$query = new WP_Query( $args );
-
-			if ( $query->have_posts() ) {
-
-				$html   = [];
+			$html   = [];
+			$html[] = $post->post_content;
+			if ( have_rows( 'mnc_filegroup', $post->ID ) ) {
 				$html[] = '<ul>';
+				while ( have_rows( 'mnc_filegroup', $post->ID ) ) {
+					the_row();
 
-				while ( $query->have_posts() ) {
-					$query->the_post();
-					$fi = $query->post;
-					$fii = wp_basename(get_attached_file( $query->post->ID ));
-					$css_class = str_replace(['/', '.'], '-', $query->post->post_mime_type);
-					$url      = wp_get_attachment_url( $query->post->ID );
-					$filename = get_the_title();
-					$filesize = filesize( get_attached_file( $query->post->ID ) );
-					$filesize = size_format( $filesize, 2 );
-					$render   =  $mi_li($url,$filename,$filesize, $css_class);
-					$html[]   = $render;
+					$arr       = get_sub_field( 'mnc_file' );
+					$url       = $arr['url'];
+					$filename  = $arr['filename'];
+					$filesize  = size_format( $arr['filesize'], 2 );
+					$css_class = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
+					$render    = $mi_li( $url, $filename, $filesize, $css_class );
+					$html[]    = $render;
 				}
-				wp_reset_postdata();
-				$html[] = '</ul>';
-				$list   = implode( "\n", $html );
-			}
 
-			return $render_template( $title, $list );
+				$html[] = '</ul>';
+
+			}
+			if ( ( current_user_can( 'editor' ) || current_user_can( 'administrator' ) ) && $post !== null ) {
+				$html[] = HTMLHelper::div( HTMLHelper::atag( get_edit_post_link( $post ), "Downloads bearbeiten" ) );
+			}
+			$list = implode( "\n", $html );
+
+			return $this->renderDownloadBox( $post->post_title, $list );
 		} );
 	}
+
+	protected function renderDownloadElement( $url, $filename, $filesize, $class = '' ) {
+		if ( $class ) {
+			$class = ' class="' . $class . '"';
+		}
+
+		return '<li' . $class . '><a href="' . $url . '" target="_self">' . $filename . ' (' . $filesize . ')</a></li>';
+	}
+
+	protected function renderDownloadgroupByPost( $post ) {
+		$html   = [];
+		if ( ! have_rows( 'mnc_filegroup', $post->ID ) ) {
+			return '';
+		}
+		$html[] = '<ul>';
+		while ( have_rows( 'mnc_filegroup', $post->ID ) ) {
+			the_row();
+
+			$arr       = get_sub_field( 'mnc_file' );
+			$url       = $arr['url'];
+			$filename  = $arr['filename'];
+			$filesize  = size_format( $arr['filesize'], 2 );
+			$css_class = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
+			$render    = $this->renderDownloadElement( $url, $filename, $filesize, $css_class );
+			$html[]    = $render;
+		}
+		$html[] = '</ul>';
+		return implode( "\n", $html );
+	}
+
+	/**
+	 * @param string $title
+	 * @param string $content
+	 *
+	 * @return string
+	 */
+	protected function renderDownloadBox( $title, $content ) {
+		return sprintf( '<div class="mi-downloads"><h3>%s<span class="uabb-icon"><i class="fi-download"></i></span></h3><div>%s</div></div>',
+			$title,
+			$content
+		);
+	}
+
+	public function add_downloads_to_page( $content ) {
+		global $post;
+		$box = '';
+		if( is_page($post->ID) ) {
+			$box =  $this->renderDownloadgroupByPost( $post );
+			if($box) {
+				$box = $this->renderDownloadBox('Dokumente:', $box);
+			}
+		}
+		return $content . $box;
+	}
+
 
 }

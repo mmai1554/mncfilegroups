@@ -35,7 +35,7 @@ class Mncfilegroups {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      Mncfilegroups_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      Mncfilegroups_Loader $loader Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -44,7 +44,7 @@ class Mncfilegroups {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
+	 * @var      string $plugin_name The string used to uniquely identify this plugin.
 	 */
 	protected $plugin_name;
 
@@ -53,7 +53,7 @@ class Mncfilegroups {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      string    $version    The current version of the plugin.
+	 * @var      string $version The current version of the plugin.
 	 */
 	protected $version;
 
@@ -110,6 +110,7 @@ class Mncfilegroups {
 		 * of the plugin.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-mncfilegroups-i18n.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/HTMLHelper.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
@@ -121,6 +122,7 @@ class Mncfilegroups {
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-mncfilegroups-public.php';
+
 
 		$this->loader = new Mncfilegroups_Loader();
 
@@ -157,6 +159,7 @@ class Mncfilegroups {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'init', $plugin_admin, 'register_cpts' );
+		// add_filter('the_content', 'wpdev_before_after');
 
 	}
 
@@ -173,6 +176,8 @@ class Mncfilegroups {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'init', $plugin_public, 'register_shortcodes' );
+		// $this->loader->add_filter( 'the_content', $plugin_public, 'add_downloads_to_page' );
 
 	}
 
@@ -189,8 +194,8 @@ class Mncfilegroups {
 	 * The name of the plugin used to uniquely identify it within the context of
 	 * WordPress and to define internationalization functionality.
 	 *
-	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
+	 * @since     1.0.0
 	 */
 	public function get_plugin_name() {
 		return $this->plugin_name;
@@ -199,8 +204,8 @@ class Mncfilegroups {
 	/**
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
-	 * @since     1.0.0
 	 * @return    Mncfilegroups_Loader    Orchestrates the hooks of the plugin.
+	 * @since     1.0.0
 	 */
 	public function get_loader() {
 		return $this->loader;
@@ -209,8 +214,8 @@ class Mncfilegroups {
 	/**
 	 * Retrieve the version number of the plugin.
 	 *
-	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
+	 * @since     1.0.0
 	 */
 	public function get_version() {
 		return $this->version;

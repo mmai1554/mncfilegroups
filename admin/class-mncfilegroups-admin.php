@@ -143,18 +143,21 @@ class Mncfilegroups_Admin {
 			'supports'            => [ 'title', 'editor' ],
 			'taxonomies'          => [ 'mnc_folder' ],
 			'hierarchical'        => false,
-			'public'              => true,
+			'public'              => false,
 			'show_ui'             => true,
 			'show_in_menu'        => true,
 			'menu_position'       => 6,
-			'show_in_admin_bar'   => true,
+			'show_in_admin_bar'   => false,
 			'show_in_nav_menus'   => false,
 			'can_export'          => true,
 			'has_archive'         => false,
 			'exclude_from_search' => true,
-			'publicly_queryable'  => true,
-			'capability_type'     => 'page',
+			'publicly_queryable'  => false,
+			'capability_type'     => 'post',
+			'rewrite'             => false,
+			'query_var'           => false,
 		];
+
 		register_post_type( 'mnc_filegroups', $args );
 
 		// Projektkategorie
@@ -190,6 +193,25 @@ class Mncfilegroups_Admin {
 			'show_tagcloud'     => false,
 		];
 		register_taxonomy( 'mnc_folder', [ 'mnc_filegroups' ], $args );
+
+		add_action( 'add_meta_boxes', function () {
+			add_meta_box(
+				'mnc_mbox_postname',
+				'Shortcode: (Copy & Paste)',
+				array( $this, 'display_postname' ),
+				'mnc_filegroups',
+				'normal',
+				'high'
+			);
+		} );
+
+
+	}
+
+	public function display_postname() {
+		global $post;
+		$text = "[mnc_doclist id={$post->ID}]";
+		echo( $text );
 	}
 
 }
