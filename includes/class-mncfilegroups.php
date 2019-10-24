@@ -121,6 +121,7 @@ class Mncfilegroups {
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/RenderDownloads.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-mncfilegroups-public.php';
 
 
@@ -177,7 +178,6 @@ class Mncfilegroups {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		$this->loader->add_action( 'init', $plugin_public, 'register_shortcodes' );
-		// $this->loader->add_filter( 'the_content', $plugin_public, 'add_downloads_to_page' );
 
 	}
 

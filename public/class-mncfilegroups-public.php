@@ -11,6 +11,7 @@
  */
 
 use mnc\HTMLHelper;
+use mnc\RenderDownloads;
 
 /**
  * The public-facing functionality of the plugin.
@@ -112,7 +113,8 @@ class Mncfilegroups_Public {
 	protected function register_shortcode_attachments() {
 		add_shortcode( 'mnc_doc_attachments', function () {
 			global $post;
-			return $this->renderDownloadBox('Downloads:', $this->renderDownloadgroupByPost($post));
+
+			return $this->renderDownloadBox( 'Downloads:', $this->renderDownloadgroupByPost( $post ) );
 		} );
 	}
 
@@ -126,30 +128,7 @@ class Mncfilegroups_Public {
 			), $params );
 			$the_id = $a['id'];
 			$empty  = $a['empty'];
-
-			// go:
-			$render_template = function ( $title, $content ) {
-				return
-					sprintf( '<div class="mi-downloads"><h3>%s<span class="uabb-icon"><i class="fi-download"></i></span></h3><div>%s</div></div>',
-						$title,
-						$content
-					);
-			};
-			$mi_li           = function ( $url, $filename, $filesize, $class = '' ) {
-				if ( $class ) {
-					$class = ' class="' . $class . '"';
-				}
-
-				return '<li' . $class . '><a href="' . $url . '" target="_self">' . $filename . ' (' . $filesize . ')</a></li>';
-			};
-
-//			$args     = array(
-//				'ID'          => $slug,
-//				'post_type'   => 'mnc_filegroups',
-//				'post_status' => 'publish',
-//				'numberposts' => 1
-//			);
-			$post = get_post( $the_id );
+			$post   = get_post( $the_id );
 			if ( ! ( $post && $post->post_type == 'mnc_filegroups' ) ) {
 				return $empty;
 			}
@@ -161,16 +140,14 @@ class Mncfilegroups_Public {
 				$html[] = '<ul>';
 				while ( have_rows( 'mnc_filegroup', $post->ID ) ) {
 					the_row();
-
 					$arr       = get_sub_field( 'mnc_file' );
 					$url       = $arr['url'];
 					$filename  = $arr['filename'];
 					$filesize  = size_format( $arr['filesize'], 2 );
 					$css_class = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
-					$render    = $mi_li( $url, $filename, $filesize, $css_class );
+					$render    = $this->renderDownloadElement( $url, $filename, $filesize, $css_class );
 					$html[]    = $render;
 				}
-
 				$html[] = '</ul>';
 
 			}
@@ -187,12 +164,11 @@ class Mncfilegroups_Public {
 		if ( $class ) {
 			$class = ' class="' . $class . '"';
 		}
-
 		return '<li' . $class . '><a href="' . $url . '" target="_self">' . $filename . ' (' . $filesize . ')</a></li>';
 	}
 
 	protected function renderDownloadgroupByPost( $post ) {
-		$html   = [];
+		$html = [];
 		if ( ! have_rows( 'mnc_filegroup', $post->ID ) ) {
 			return '';
 		}
@@ -209,31 +185,39 @@ class Mncfilegroups_Public {
 			$html[]    = $render;
 		}
 		$html[] = '</ul>';
+
 		return implode( "\n", $html );
 	}
 
 	/**
+	 * renders the default box
+	 * UABB Icons must be active
+	 *
 	 * @param string $title
 	 * @param string $content
 	 *
 	 * @return string
 	 */
 	protected function renderDownloadBox( $title, $content ) {
-		return sprintf( '<div class="mi-downloads"><h3>%s<span class="uabb-icon"><i class="fi-download"></i></span></h3><div>%s</div></div>',
-			$title,
-			$content
-		);
+//		return sprintf( '<div class="mi-downloads"><h4>%s<span class="uabb-icon"><i class="fi-download"></i></span></h4><div>%s</div></div>',
+//			$title,
+//			$content
+//		);
+		$render = new RenderDownloads( $title, $content );
+
+		return $render->render();
 	}
 
 	public function add_downloads_to_page( $content ) {
 		global $post;
 		$box = '';
-		if( is_page($post->ID) ) {
-			$box =  $this->renderDownloadgroupByPost( $post );
-			if($box) {
-				$box = $this->renderDownloadBox('Dokumente:', $box);
+		if ( is_page( $post->ID ) ) {
+			$box = $this->renderDownloadgroupByPost( $post );
+			if ( $box ) {
+				$box = $this->renderDownloadBox( 'Dokumente:', $box );
 			}
 		}
+
 		return $content . $box;
 	}
 
