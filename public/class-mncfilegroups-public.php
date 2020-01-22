@@ -145,7 +145,7 @@ class Mncfilegroups_Public {
 					$filename  = $arr['filename'];
 					$filesize  = size_format( $arr['filesize'], 2 );
 					$css_class = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
-					$render    = $this->renderDownloadElement( $url, $filename, $filesize, $css_class );
+					$render    = RenderDownloads::renderElement( $url, $filename, $filesize, $css_class );
 					$html[]    = $render;
 				}
 				$html[] = '</ul>';
@@ -160,12 +160,28 @@ class Mncfilegroups_Public {
 		} );
 	}
 
-	protected function renderDownloadElement( $url, $filename, $filesize, $class = '' ) {
-		if ( $class ) {
-			$class = ' class="' . $class . '"';
+	protected function getFilesDataAsArray( WP_Post $post ) {
+		$file_list = [];
+		if ( have_rows( 'mnc_filegroup', $post->ID ) ) {
+			while ( have_rows( 'mnc_filegroup', $post->ID ) ) {
+				the_row();
+				$arr         = get_sub_field( 'mnc_file' );
+				$url         = $arr['url'];
+				$filename    = $arr['filename'];
+				$filesize    = size_format( $arr['filesize'], 2 );
+				$css_class   = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
+				$file_list[] = [
+					'url'         => $url,
+					'file'        => $filename,
+					'displayname' => $filename,
+					'size'        => $filesize,
+					'class'       => $css_class
+				];
+			}
 		}
-		return '<li' . $class . '><a href="' . $url . '" target="_self">' . $filename . ' (' . $filesize . ')</a></li>';
+		return $file_list;
 	}
+
 
 	protected function renderDownloadgroupByPost( $post ) {
 		$html = [];
@@ -181,7 +197,7 @@ class Mncfilegroups_Public {
 			$filename  = $arr['filename'];
 			$filesize  = size_format( $arr['filesize'], 2 );
 			$css_class = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
-			$render    = $this->renderDownloadElement( $url, $filename, $filesize, $css_class );
+			$render    = RenderDownloads::renderElement( $url, $filename, $filesize, $css_class );
 			$html[]    = $render;
 		}
 		$html[] = '</ul>';
@@ -191,7 +207,6 @@ class Mncfilegroups_Public {
 
 	/**
 	 * renders the default box
-	 * UABB Icons must be active
 	 *
 	 * @param string $title
 	 * @param string $content
@@ -199,10 +214,6 @@ class Mncfilegroups_Public {
 	 * @return string
 	 */
 	protected function renderDownloadBox( $title, $content ) {
-//		return sprintf( '<div class="mi-downloads"><h4>%s<span class="uabb-icon"><i class="fi-download"></i></span></h4><div>%s</div></div>',
-//			$title,
-//			$content
-//		);
 		$render = new RenderDownloads( $title, $content );
 
 		return $render->render();

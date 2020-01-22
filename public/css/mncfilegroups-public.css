@@ -2,3 +2,57 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
+.mncfilegroups {
+    border: 1px solid #EEEEEE;
+    border-radius: 3px;
+}
+
+.mncfilegroups > div {
+    padding: 10px 20px 20px 10px;
+}
+
+.mncfilegroups h3, .mncfilegroups h4 {
+    background-color: #DDD;
+    padding: 3px 10px;
+    color: #FFFFFF;
+}
+
+span.mnc_download {
+    float: right;
+    background-image: url("/wp-content/plugins/mncfilegroups/public/assets/icon_download_w.png");
+    background-size:20px 20px;
+    background-repeat: no-repeat;
+    background-position: 0;
+    height: 30px;
+    width: 20px;
+}
+
+.mncfilegroups ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mncfilegroups li {
+    margin-bottom: 1em;
+}
+
+.mncfilegroups li:before {
+    display: inline-block;
+    content: ' ';
+    background-image: url("/wp-content/plugins/mncfilegroups/public/assets/pdf-icon.svg");
+    background-repeat: no-repeat;
+    background-size: 28px 38px;
+    height: 30px;
+    width: 28px;
+}
+
+.mncfilegroups li.application-msword:before {
+    content: "\eae1";
+    color: #2f74b8;
+}
+
+.mncfilegroups li.application-vnd-ms-excel:before {
+    content: "\eae2";
+    color: #2b8a2d;
+}
