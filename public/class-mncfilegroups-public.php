@@ -142,10 +142,10 @@ class Mncfilegroups_Public {
 					the_row();
 					$arr       = get_sub_field( 'mnc_file' );
 					$url       = $arr['url'];
-					$filename  = $arr['filename'];
+					$displayname  = isset($arr['caption']) && $arr['caption'] != '' ? $arr['caption'] : $arr['filename'];
 					$filesize  = size_format( $arr['filesize'], 2 );
 					$css_class = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
-					$render    = RenderDownloads::renderElement( $url, $filename, $filesize, $css_class );
+					$render    = RenderDownloads::renderElement( $url, $displayname, $filesize, $css_class );
 					$html[]    = $render;
 				}
 				$html[] = '</ul>';
