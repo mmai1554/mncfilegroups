@@ -104,7 +104,7 @@ class Mncfilegroups_Admin {
 	}
 
 	public function register_cpts() {
-		$this->register_cpt_filegroups();;
+		$this->register_cpt_filegroups();
 	}
 
 	protected function register_cpt_filegroups() {
@@ -207,6 +207,72 @@ class Mncfilegroups_Admin {
 		} );
 
 
+	}
+
+	public function init_acf() {
+		acf_add_local_field_group( array(
+			'key'                   => 'group_5d39ce66b4ddb',
+			'title'                 => 'MNC Filegroups',
+			'fields'                => array(
+				array(
+					'key'               => 'field_5d39ce89d63f4',
+					'label'             => 'Dokumente',
+					'name'              => 'mnc_filegroup',
+					'type'              => 'repeater',
+					'instructions'      => '',
+					'required'          => 0,
+					'conditional_logic' => 0,
+					'wrapper'           => array(
+						'width' => '',
+						'class' => '',
+						'id'    => '',
+					),
+					'collapsed'         => '',
+					'min'               => 0,
+					'max'               => 0,
+					'layout'            => 'table',
+					'button_label'      => '',
+					'sub_fields'        => array(
+						array(
+							'key'               => 'field_5d39cecfd63f5',
+							'label'             => 'Dokument',
+							'name'              => 'mnc_file',
+							'type'              => 'file',
+							'instructions'      => 'Wählen Sie die Datei aus. Erlaubt sind zzt. PDF, Word-Dateien, Excel-Dateien',
+							'required'          => 0,
+							'conditional_logic' => 0,
+							'wrapper'           => array(
+								'width' => '',
+								'class' => '',
+								'id'    => '',
+							),
+							'return_format'     => 'array',
+							'library'           => 'all',
+							'min_size'          => '',
+							'max_size'          => '',
+							'mime_types'        => 'pdf,doc,docx,xls,zip',
+						),
+					),
+				),
+			),
+			'location'              => array(
+				array(
+					array(
+						'param'    => 'post_type',
+						'operator' => '==',
+						'value'    => 'mnc_filegroups',
+					),
+				)
+			),
+			'menu_order'            => 0,
+			'position'              => 'acf_after_title',
+			'style'                 => 'seamless',
+			'label_placement'       => 'top',
+			'instruction_placement' => 'label',
+			'hide_on_screen'        => '',
+			'active'                => true,
+			'description'           => '',
+		) );
 	}
 
 	public function display_postname() {
