@@ -10,6 +10,8 @@
  * @subpackage Mncfilegroups/admin
  */
 
+use mnc\MNCFilegroups;
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -104,7 +106,8 @@ class Mncfilegroups_Admin {
 	}
 
 	public function register_cpts() {
-		$this->register_cpt_filegroups();
+		MNCFilegroups::registerCPT();
+		// $this->register_cpt_filegroups();
 	}
 
 	protected function register_cpt_filegroups() {

@@ -70,7 +70,7 @@ class Mncfilegroups {
 		if ( defined( 'MNCFILEGROUPS_VERSION' ) ) {
 			$this->version = MNCFILEGROUPS_VERSION;
 		} else {
-			$this->version = '1.0.0';
+			$this->version = '1.1';
 		}
 		$this->plugin_name = 'mncfilegroups';
 
@@ -111,6 +111,7 @@ class Mncfilegroups {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-mncfilegroups-i18n.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/HTMLHelper.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/MNCFilegroups.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
