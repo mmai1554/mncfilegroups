@@ -11,7 +11,7 @@
  */
 
 use mnc\HTMLHelper;
-use mnc\RenderDownloads;
+use mnc\RenderDownloadBox;
 
 /**
  * The public-facing functionality of the plugin.
@@ -107,16 +107,16 @@ class Mncfilegroups_Public {
 
 	public function register_shortcodes() {
 		$this->register_shortcode_list();
-		$this->register_shortcode_attachments();
+		// $this->register_shortcode_attachments();
 	}
 
-	protected function register_shortcode_attachments() {
-		add_shortcode( 'mnc_doc_attachments', function () {
-			global $post;
-
-			return $this->renderDownloadBox( 'Downloads:', $this->renderDownloadgroupByPost( $post ) );
-		} );
-	}
+//	protected function register_shortcode_attachments() {
+//		add_shortcode( 'mnc_doc_attachments', function () {
+//			global $post;
+//
+//			return $this->renderDownloadBox( 'Downloads:', $this->renderDownloadgroupByPost( $post ) );
+//		} );
+//	}
 
 	protected function register_shortcode_list() {
 		add_shortcode( 'mnc_doclist', function ( $params ) {
@@ -145,7 +145,7 @@ class Mncfilegroups_Public {
 					$displayname  = isset($arr['caption']) && $arr['caption'] != '' ? $arr['caption'] : $arr['filename'];
 					$filesize  = size_format( $arr['filesize'], 2 );
 					$css_class = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
-					$render    = RenderDownloads::renderElement( $url, $displayname, $filesize, $css_class );
+					$render    = RenderDownloadBox::renderElement( $url, $displayname, $filesize, $css_class );
 					$html[]    = $render;
 				}
 				$html[] = '</ul>';
@@ -183,27 +183,27 @@ class Mncfilegroups_Public {
 	}
 
 
-	protected function renderDownloadgroupByPost( $post ) {
-		$html = [];
-		if ( ! have_rows( 'mnc_filegroup', $post->ID ) ) {
-			return '';
-		}
-		$html[] = '<ul>';
-		while ( have_rows( 'mnc_filegroup', $post->ID ) ) {
-			the_row();
-
-			$arr       = get_sub_field( 'mnc_file' );
-			$url       = $arr['url'];
-			$filename  = $arr['filename'];
-			$filesize  = size_format( $arr['filesize'], 2 );
-			$css_class = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
-			$render    = RenderDownloads::renderElement( $url, $filename, $filesize, $css_class );
-			$html[]    = $render;
-		}
-		$html[] = '</ul>';
-
-		return implode( "\n", $html );
-	}
+//	protected function renderDownloadgroupByPost( $post ) {
+//		$html = [];
+//		if ( ! have_rows( 'mnc_filegroup', $post->ID ) ) {
+//			return '';
+//		}
+//		$html[] = '<ul>';
+//		while ( have_rows( 'mnc_filegroup', $post->ID ) ) {
+//			the_row();
+//
+//			$arr       = get_sub_field( 'mnc_file' );
+//			$url       = $arr['url'];
+//			$filename  = $arr['filename'];
+//			$filesize  = size_format( $arr['filesize'], 2 );
+//			$css_class = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
+//			$render    = RenderDownloadBox::renderElement( $url, $filename, $filesize, $css_class );
+//			$html[]    = $render;
+//		}
+//		$html[] = '</ul>';
+//
+//		return implode( "\n", $html );
+//	}
 
 	/**
 	 * renders the default box
@@ -214,23 +214,23 @@ class Mncfilegroups_Public {
 	 * @return string
 	 */
 	protected function renderDownloadBox( $title, $content ) {
-		$render = new RenderDownloads( $title, $content );
+		$render = new RenderDownloadBox( $title, $content );
 
 		return $render->render();
 	}
 
-	public function add_downloads_to_page( $content ) {
-		global $post;
-		$box = '';
-		if ( is_page( $post->ID ) ) {
-			$box = $this->renderDownloadgroupByPost( $post );
-			if ( $box ) {
-				$box = $this->renderDownloadBox( 'Dokumente:', $box );
-			}
-		}
-
-		return $content . $box;
-	}
+//	public function add_downloads_to_page( $content ) {
+//		global $post;
+//		$box = '';
+//		if ( is_page( $post->ID ) ) {
+//			$box = $this->renderDownloadgroupByPost( $post );
+//			if ( $box ) {
+//				$box = $this->renderDownloadBox( 'Dokumente:', $box );
+//			}
+//		}
+//
+//		return $content . $box;
+//	}
 
 
 }

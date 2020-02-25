@@ -2,7 +2,7 @@
 
 namespace mnc;
 
-class RenderDownloads {
+class RenderDownloadBox {
 
 	protected $title = 'Downloads';
 	protected $content = '';
@@ -28,14 +28,11 @@ class RenderDownloads {
 		return $var;
 	}
 
-	function render_list() {
-
-	}
-
 	public function render() {
-		// try fetching template in theme:
+		// 1. try fetching template in theme:
 		$file = get_stylesheet_directory() . '/includes/mnc/downloadbox.php';
 		if ( ! file_exists( $file ) ) {
+			// 2. use default rendering in plugin:
 			return $this->renderDefaultBox();
 		}
 		ob_start();
