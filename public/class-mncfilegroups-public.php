@@ -124,7 +124,7 @@ class Mncfilegroups_Public {
 			// init:
 			$a      = shortcode_atts( array(
 				'id'    => '',
-				'empty' => 'Notfound',
+				'empty' => '',
 			), $params );
 			$the_id = $a['id'];
 			$empty  = $a['empty'];
@@ -155,7 +155,7 @@ class Mncfilegroups_Public {
 				$html[] = HTMLHelper::div( HTMLHelper::atag( get_edit_post_link( $post ), "Downloads bearbeiten" ) );
 			}
 			$list = implode( "\n", $html );
-			return (new \mnc\RenderDownloadBox( $post->post_title, $list, $post->ID ))->render();
+			return (new RenderDownloadBox( $post->post_title, $list, $post->ID ))->render();
 		} );
 	}
 
