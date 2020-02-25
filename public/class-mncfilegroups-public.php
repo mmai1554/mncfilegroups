@@ -155,8 +155,7 @@ class Mncfilegroups_Public {
 				$html[] = HTMLHelper::div( HTMLHelper::atag( get_edit_post_link( $post ), "Downloads bearbeiten" ) );
 			}
 			$list = implode( "\n", $html );
-
-			return $this->renderDownloadBox( $post->post_title, $list );
+			return (new \mnc\RenderDownloadBox( $post->post_title, $list, $post->ID ))->render();
 		} );
 	}
 

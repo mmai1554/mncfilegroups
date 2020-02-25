@@ -6,26 +6,21 @@ class RenderDownloadBox {
 
 	protected $title = 'Downloads';
 	protected $content = '';
+	protected $dom_id = '';
 
-	function __construct( $title, $content ) {
+	/**
+	 * RenderDownloadBox constructor.
+	 *
+	 * @param string $title
+	 * @param string $content
+	 * @param null|string $id
+	 */
+	public function __construct( $title, $content, $id = null ) {
 		$this->title   = $title;
 		$this->content = $content;
-	}
-
-
-	protected function renderDefaultBox() {
-		$file = plugin_dir_path( __FILE__ ) . 'templates/downloadbox.php';
-		if ( ! file_exists( $file ) ) {
-			return 'ERROR: Templates downloadbox not found in ' . $file;
+		if ( $id !== null ) {
+			$this->dom_id = 'MNCCont_'.$id;
 		}
-		ob_start();
-		$title   = $this->title;
-		$content = $this->content;
-		require $file;
-		$var = ob_get_contents();
-		ob_end_clean();
-
-		return $var;
 	}
 
 	public function render() {
@@ -33,11 +28,15 @@ class RenderDownloadBox {
 		$file = get_stylesheet_directory() . '/includes/mnc/downloadbox.php';
 		if ( ! file_exists( $file ) ) {
 			// 2. use default rendering in plugin:
-			return $this->renderDefaultBox();
+			$file = plugin_dir_path( __FILE__ ) . 'templates/downloadbox.php';
+			if ( ! file_exists( $file ) ) {
+				return 'ERROR: Templates downloadbox not found in ' . $file;
+			}
 		}
 		ob_start();
 		$title   = $this->title;
 		$content = $this->content;
+		$dom_id  = $this->dom_id;
 		require $file;
 		$var = ob_get_contents();
 		ob_end_clean();
@@ -49,6 +48,7 @@ class RenderDownloadBox {
 		if ( $class ) {
 			$class = ' class="' . $class . '"';
 		}
+
 		return '<li' . $class . '><a href="' . $url . '" target="_self">' . $filename . ' (' . $filesize . ')</a></li>';
 	}
 
