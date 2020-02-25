@@ -2,7 +2,7 @@
 
 namespace mnc;
 
-class RenderDownloadBox {
+class RenderDownloadContainer {
 
 	protected $title = 'Downloads';
 	protected $content = '';

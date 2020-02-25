@@ -11,7 +11,7 @@
  */
 
 use mnc\HTMLHelper;
-use mnc\RenderDownloadBox;
+use mnc\RenderDownloadContainer;
 
 /**
  * The public-facing functionality of the plugin.
@@ -145,7 +145,7 @@ class Mncfilegroups_Public {
 					$displayname  = isset($arr['caption']) && $arr['caption'] != '' ? $arr['caption'] : $arr['filename'];
 					$filesize  = size_format( $arr['filesize'], 2 );
 					$css_class = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
-					$render    = RenderDownloadBox::renderElement( $url, $displayname, $filesize, $css_class );
+					$render    = RenderDownloadContainer::renderElement( $url, $displayname, $filesize, $css_class );
 					$html[]    = $render;
 				}
 				$html[] = '</ul>';
@@ -155,7 +155,7 @@ class Mncfilegroups_Public {
 				$html[] = HTMLHelper::div( HTMLHelper::atag( get_edit_post_link( $post ), "Downloads bearbeiten" ) );
 			}
 			$list = implode( "\n", $html );
-			return (new RenderDownloadBox( $post->post_title, $list, $post->ID ))->render();
+			return (new RenderDownloadContainer( $post->post_title, $list, $post->ID ))->render();
 		} );
 	}
 
@@ -213,7 +213,7 @@ class Mncfilegroups_Public {
 	 * @return string
 	 */
 	protected function renderDownloadBox( $title, $content ) {
-		$render = new RenderDownloadBox( $title, $content );
+		$render = new RenderDownloadContainer( $title, $content );
 
 		return $render->render();
 	}
