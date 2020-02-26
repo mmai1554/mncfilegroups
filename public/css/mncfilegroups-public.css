@@ -2,7 +2,7 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
-.mncfilegroup_container {
+.mnc-fg-container {
     border: 1px solid #DDD;
     border-radius: 3px;
 }
@@ -50,7 +50,7 @@
 }
 
 /**
-each li has 2 container, left div is preview thumb mnc-fg-thumb, right span is description
+each element has 2 container, left div is preview thumb mnc-fg-thumb, right span is description
  */
 .mnc-fg-el-wrapper {
     display: flex;
