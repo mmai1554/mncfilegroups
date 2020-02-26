@@ -132,30 +132,9 @@ class Mncfilegroups_Public {
 			if ( ! ( $post && $post->post_type == 'mnc_filegroups' ) ) {
 				return $empty;
 			}
-
 			//
-			$html   = [];
-			$html[] = $post->post_content;
-			if ( have_rows( 'mnc_filegroup', $post->ID ) ) {
-				$html[] = '<ul>';
-				while ( have_rows( 'mnc_filegroup', $post->ID ) ) {
-					the_row();
-					$arr       = get_sub_field( 'mnc_file' );
-					$url       = $arr['url'];
-					$displayname  = isset($arr['caption']) && $arr['caption'] != '' ? $arr['caption'] : $arr['filename'];
-					$filesize  = size_format( $arr['filesize'], 2 );
-					$css_class = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
-					$render    = RenderDownloadContainer::renderElement( $url, $displayname, $filesize, $css_class );
-					$html[]    = $render;
-				}
-				$html[] = '</ul>';
-
-			}
-			if ( ( current_user_can( 'editor' ) || current_user_can( 'administrator' ) ) && $post !== null ) {
-				$html[] = HTMLHelper::div( HTMLHelper::atag( get_edit_post_link( $post ), "Downloads bearbeiten" ) );
-			}
-			$list = implode( "\n", $html );
-			return (new RenderDownloadContainer( $post->post_title, $list, $post->ID ))->render();
+			$list = ( new \mnc\RenderDownloadList( $post ) )->render();
+			return ( new RenderDownloadContainer( $post->post_title, $list, $post->ID ) )->render();
 		} );
 	}
 
@@ -178,6 +157,7 @@ class Mncfilegroups_Public {
 				];
 			}
 		}
+
 		return $file_list;
 	}
 
