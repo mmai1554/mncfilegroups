@@ -120,21 +120,38 @@ class Mncfilegroups_Public {
 
 	protected function register_shortcode_list() {
 		add_shortcode( 'mnc_doclist', function ( $params ) {
-
 			// init:
-			$a      = shortcode_atts( array(
-				'id'    => '',
-				'empty' => '',
+			$a              = shortcode_atts( array(
+				'id'            => '',
+				'hide_if_empty' => true,
+				'emptymessage'  => '',
+				'template'      => '',
+				'title'         => '',
 			), $params );
-			$the_id = $a['id'];
-			$empty  = $a['empty'];
-			$post   = get_post( $the_id );
-			if ( ! ( $post && $post->post_type == 'mnc_filegroups' ) ) {
+			$the_id         = $a['id'];
+			$hide_if_empty  = $a['hide_if_empty'];
+			$empty          = $a['emptymessage'];
+			$path_container = $a['template'];
+			if ( ! $the_id ) {
+				global $post;
+			}
+			$post = get_post( $the_id );
+			if ( ! $post ) {
 				return $empty;
 			}
-			//
-			$list = ( new \mnc\RenderDownloadList( $post ) )->render();
-			return ( new RenderDownloadContainer( $post->post_title, $list, $post->ID ) )->render();
+			$title     = $a['title'] != '' ? $a['title'] : $post->post_title;
+			$objRender = new \mnc\RenderDownloadList( $post );
+			$list      = ( $objRender )->render();
+			if ( $objRender->isEmpty() && $hide_if_empty ) {
+				return HTMLHelper::div( $empty );
+			}
+
+			$container = new RenderDownloadContainer( $title, $list, $post->ID );
+			if ( $path_container ) {
+				$container->setTemplate( $path_container );
+			}
+
+			return ( $container )->render();
 		} );
 	}
 

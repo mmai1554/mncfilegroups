@@ -7,6 +7,7 @@ class RenderDownloadContainer {
 	protected $title = 'Downloads';
 	protected $content = '';
 	protected $dom_id = '';
+	protected $template = null;
 
 	/**
 	 * RenderDownloadBox constructor.
@@ -19,20 +20,42 @@ class RenderDownloadContainer {
 		$this->title   = $title;
 		$this->content = $content;
 		if ( $id !== null ) {
-			$this->dom_id = 'MNCCont_'.$id;
+			$this->dom_id = 'MNCCont_' . $id;
+		}
+	}
+
+	public function setTemplate( $template ) {
+		if(substr($template,0,1) !== '/') {
+			$template = '/' . $template;
+		}
+		$this->template = $template;
+	}
+
+	/**
+	 * try loading the default templates
+	 * 1) customer based template, set in shortcode
+	 * 2) default template in theme
+	 * 3) default template in plugin
+	 * @return string
+	 */
+	public function loadTemplate() {
+		$file = get_stylesheet_directory() . $this->template;
+		if ( $this->template !== null && file_exists( $file ) ) {
+			return $file;
+		}
+		$file = get_stylesheet_directory() . '/includes/mnc/downloadbox.php';
+		if ( file_exists( $file ) ) {
+			return $file;
+		}
+		$file = plugin_dir_path( __FILE__ ) . 'templates/downloadbox.php';
+		if ( file_exists( $file ) ) {
+			return $file;
 		}
 	}
 
 	public function render() {
 		// 1. try fetching template in theme:
-		$file = get_stylesheet_directory() . '/includes/mnc/downloadbox.php';
-		if ( ! file_exists( $file ) ) {
-			// 2. use default rendering in plugin:
-			$file = plugin_dir_path( __FILE__ ) . 'templates/downloadbox.php';
-			if ( ! file_exists( $file ) ) {
-				return 'ERROR: Templates downloadbox not found in ' . $file;
-			}
-		}
+		$file = $this->loadTemplate();
 		ob_start();
 		$title   = $this->title;
 		$content = $this->content;

@@ -13,6 +13,8 @@ class RenderDownloadList {
 	 */
 	protected $list = null;
 
+	protected $count = 0;
+
 	public function __construct( \WP_Post $post ) {
 		$this->post = $post;
 	}
@@ -24,11 +26,15 @@ class RenderDownloadList {
 	}
 
 	public function build() {
-		$post   = $this->post;
-		$html[] = $post->post_content;
+		$post = $this->post;
+		if ( $post->post_type == MNCFilegroups::CPT_MNCFILEGROUP ) {
+			$html[] = $post->post_content;
+		}
+		$this->count = 0;
 		if ( have_rows( 'mnc_filegroup', $post->ID ) ) {
 			$html[] = '<ul>';
 			while ( have_rows( 'mnc_filegroup', $post->ID ) ) {
+				$this->count ++;
 				the_row();
 				$arr = get_sub_field( 'mnc_file' );
 				if ( is_array( $arr ) && count( $arr ) > 0 ) {
@@ -52,15 +58,19 @@ class RenderDownloadList {
 		return $html;
 	}
 
+	public function isEmpty() {
+		return $this->count == 0;
+	}
+
 	public function renderEl( array $arr ) {
 		$attachment_id = $arr['ID'];
-		$url         = $arr['url'];
-		$displayname = isset( $arr['caption'] ) && $arr['caption'] != '' ? $arr['caption'] : $arr['filename'];
+		$url           = $arr['url'];
+		$displayname   = isset( $arr['caption'] ) && $arr['caption'] != '' ? $arr['caption'] : $arr['filename'];
 		// $filesize    = size_format( $arr['filesize'], 2 );
-		$css_class   = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
-		$title = $this->getTitleinfo($arr);
-		$image = wp_get_attachment_image_src( $attachment_id);
-		if(!$image) {
+		$css_class = str_replace( [ '/', '.' ], '-', $arr['mime_type'] );
+		$title     = $this->getTitleinfo( $arr );
+		$image     = wp_get_attachment_image_src( $attachment_id );
+		if ( ! $image ) {
 			$image_url = '/wp-content/plugins/mncfilegroups/public/assets/pdf-icon.svg';
 		} else {
 			$image_url = $image[0];
@@ -82,9 +92,10 @@ class RenderDownloadList {
 		return $var;
 	}
 
-	protected function getTitleinfo($arr) {
-		$filesize    = size_format( $arr['filesize'], 2 );
-		return sprintf("Dokument %s öffnen oder herunterladen, Dateigröße: %s", $arr['filename'], $filesize);
+	protected function getTitleinfo( $arr ) {
+		$filesize = size_format( $arr['filesize'], 2 );
+
+		return sprintf( "Dokument %s öffnen oder herunterladen, Dateigröße: %s", $arr['filename'], $filesize );
 	}
 
 	public static function renderElement( $url, $filename, $filesize, $class = '' ) {
