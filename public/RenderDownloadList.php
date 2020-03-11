@@ -52,7 +52,7 @@ class RenderDownloadList {
 
 		}
 		if ( ( current_user_can( 'editor' ) || current_user_can( 'administrator' ) ) && $post !== null ) {
-			$html[] = HTMLHelper::div( HTMLHelper::atag( get_edit_post_link( $post ), "Downloads bearbeiten" ) );
+			$html[] = HTMLHelper::div( HTMLHelper::atag( get_edit_post_link( $post ), "..." ) );
 		}
 
 		return $html;
